@@ -1,7 +1,7 @@
 <template>
   <div id="nav">
-    <router-link to="/">PREVIEW</router-link> |
-    <router-link to="/about">MAKE</router-link>
+    <router-link to="/">見積もり</router-link> |
+    <router-link to="/about">Help</router-link>
   </div>
   <div class="contents">
     <router-view/>
@@ -9,13 +9,13 @@
 </template>
 
 <style>
-#app {
+/* #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
+} */
 
 #nav {
   padding: 30px;

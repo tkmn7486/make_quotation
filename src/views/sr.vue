@@ -17,7 +17,7 @@ import {ref} from 'vue'
 // import {QrcodeStream} from 'vue-qrcode-reader'
 
 export default {
-  name: 'Self',
+  name: 'SR',
   // components: {
   //   QrcodeStream
   // },

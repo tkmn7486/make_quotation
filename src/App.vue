@@ -1,12 +1,43 @@
 <template>
-  <div id="nav">
-    <router-link to="/">見積もり</router-link> |
-    <router-link to="/about">履歴検索</router-link>
+  <button class="menu_button" @click="push_menu_button">=</button>
+  <div id="nav" class="nav" v-bind:style='{display: nav_display}'>
+    <div class="nav_contents">
+      <h2>メニュー</h2>
+      <router-link to="/">見積もり</router-link> |
+      <router-link to="/sr">履歴検索</router-link> |
+      <router-link to="/sp">修理料金検索</router-link> |
+      <router-link to="/price_cur">希少修理計算</router-link>
+    </div>
   </div>
   <div class="contents">
     <router-view/>
   </div>
 </template>
+
+<script>
+import {ref} from 'vue'
+
+export default {
+  setup(){
+    let nav_display = ref("none")
+
+    const push_menu_button=()=>{
+      if(nav_display.value == "none"){
+        nav_display.value = "block"
+        console.log(nav_display.value)
+      }else{
+        nav_display.value = "none"
+        console.log(nav_display.value)
+      }
+    }
+
+    return{
+      nav_display,
+      push_menu_button,
+    }
+  }
+}
+</script>
 
 <style>
 /* #app {
@@ -19,6 +50,11 @@
 
 #nav {
   padding: 30px;
+  text-align:center;
+}
+
+.nav{
+  display:none;
 }
 
 #nav a {

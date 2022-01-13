@@ -1,7 +1,7 @@
 <template>
   <div id="nav">
     <router-link to="/">見積もり</router-link> |
-    <router-link to="/about">Help</router-link>
+    <router-link to="/about">履歴検索</router-link>
   </div>
   <div class="contents">
     <router-view/>

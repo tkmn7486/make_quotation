@@ -1,16 +1,19 @@
 <template>
-  <button class="menu_button" @click="push_menu_button">=</button>
-  <div id="nav" class="nav" v-bind:style='{display: nav_display}'>
-    <div class="nav_contents">
-      <h2>メニュー</h2>
-      <router-link to="/">見積もり</router-link> |
-      <router-link to="/sr">履歴検索</router-link> |
-      <router-link to="/sp">修理料金検索</router-link> |
-      <router-link to="/price_cur">希少修理計算</router-link>
+  <div class="main_app">
+    <button class="menu_button" @click="push_menu_button">=</button>
+    <div id="nav" class="nav" v-bind:style='{display: nav_display}'>
+      <div class="nav_contents">
+        <h2>メニュー</h2>
+        <router-link to="/">見積もり</router-link> |
+        <router-link to="/sr">履歴検索</router-link> |
+        <router-link to="/sp">修理料金検索</router-link> |
+        <router-link to="/price_cur">希少修理計算</router-link> |
+        <router-link to="/take_over">引き継ぎ作成</router-link>
+      </div>
     </div>
-  </div>
-  <div class="contents">
-    <router-view/>
+    <div class="contents">
+      <router-view/>
+    </div>
   </div>
 </template>
 

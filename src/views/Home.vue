@@ -1,50 +1,82 @@
 <template>
   <div class="app">
-    <div class="edit">
-      <button class="edit_close_button">×</button>
-      <div class="edit_contents">
-        <h2>追加 >></h2>
-        <h3>店舗：
-          <select v-model="shop">
-            <option v-for="shops in shop_list" :key="shops.id">{{shops.label}}</option>
-          </select>
-        </h3>
-        <h3>機種名：<input v-model="model_name"></h3>
-        <div class="type_form">
-          <h3>種別：
-            <select v-model="product_type">
-              <option v-for="type in type_list" :key="type.id">{{type.label}}</option>
+    <div class="edit" :style="{display:edit_style}">
+      <!-- 入力フォーム側 -->
+      <div class="edit_main">
+        <button class="edit_close_button" @click="edit_close">×</button>
+        <div class="edit_contents">
+          <h2 class="base_title">基礎情報 >></h2>
+          <h3>店舗：
+            <select v-model="shop">
+              <option v-for="shops in shop_list" :key="shops.id">{{shops.label}}</option>
             </select>
           </h3>
-        </div>
+          <h3>機種名：<input v-model="model_name"></h3>
 
-        <div class="product_form">
-          <h3>名称：
-            <select v-model="product_name">
-              <option v-for="products in product_list" :key="products.id">{{products.label}}</option>
-            </select>
-          </h3>
-        </div>
+          <h2 class="individual_title">個別情報</h2>
+          <div class="type_form">
+            <h3>種別：
+              <select v-model="product_type">
+                <option v-for="type in type_list" :key="type.id">{{type.label}}</option>
+              </select>
+            </h3>
+          </div>
 
-        <div class="price_form">
-          <h3>金額(税抜)：
-            <input v-model="price">
-          </h3>
-          <h3>消費税：{{Number(price)/10}}</h3>
-        </div>
+          <div class="product_form">
+            <h3>名称：
+              <select v-model="product_name">
+                <option v-for="products in product_list" :key="products.id">{{products.label}}</option>
+              </select>
+            </h3>
+          </div>
 
-        <div class="other_form">
-          <h3>↓備考↓</h3>
-          <textarea v-model="other" name="product_other" id="product_other" cols="30" rows="10"></textarea>
-        </div>
+          <div class="price_form">
+            <h3>金額(税抜)：
+              <input v-model="price">
+            </h3>
+            <h3>消費税：{{Number(price)/10}}</h3>
+          </div>
 
-        <button @click="push">追加</button>
-        <button @click="create">見積書作成</button>
+          <div class="other_form">
+            <h3>↓備考↓</h3>
+            <textarea v-model="other" name="product_other" id="product_other" cols="30" rows="10"></textarea>
+          </div>
+
+          <button @click="push">追加</button>
+          <button @click="create">見積書作成</button>
+        </div>
+      </div>
+
+      <!-- 追加内容のプレビュー -->
+      <div class="edit_sub">
+        <div class="edit_sub_contents">
+          <h2>↓追加済みのアイテム↓</h2>
+          <table>
+            <tr>
+              <th>No.</th>
+              <th>種別</th>
+              <th>名称</th>
+              <th>金額（税抜）</th>
+              <th>消費税</th>
+              <th>備考</th>
+            </tr>
+            <tr v-for="(list, index) in item_lists" :key="list.id">
+              <td>{{list.number}}</td>
+              <td>{{list.type}}</td>
+              <td>{{list.name}}</td>
+              <td>{{list.price}}円</td>
+              <td>{{list.tax}}円</td>
+              <td><textarea v-model="list.other"></textarea></td>
+              <td><button @click="delete_list(index)">削除</button></td>
+            </tr>
+          </table>
+        </div>
       </div>
     </div>
 
 
-    <div class="preview">
+<!-- 見積書本体 -->
+    <div class="preview" :style="{display:preview_style}">
       <div class="title">
         <h1>お見積り</h1>
       </div>
@@ -52,26 +84,26 @@
         <h3 class="shop_name">{{shop}}</h3>
       </div>
       <h2>機種名：{{model_name}}</h2>
-      <table>
+      <table class="preview_table" border="1">
         <tr>
-          <th>No.</th>
-          <th>サービスタイプ</th>
-          <th>名称</th>
-          <th>料金</th>
-          <th>消費税</th>
-          <th>備考</th>
+          <th class="th_No">No.</th>
+          <th class="th_type">サービスタイプ</th>
+          <th class="th_name">名称</th>
+          <th class="th_price">料金</th>
+          <th class="th_tax">消費税</th>
+          <th class="th_other">備考</th>
         </tr>
         <tr v-for="item_list in item_lists" :key="item_list.id">
           <td>{{item_list.number}}</td>
           <td>{{item_list.type}}</td>
           <td>{{item_list.name}}</td>
-          <td>{{item_list.price}}</td>
-          <td>{{item_list.tax}}</td>
+          <td>{{item_list.price}}円</td>
+          <td>{{item_list.tax}}円</td>
           <td>{{item_list.other}}</td>
         </tr>
       </table>
-      <h4>点数：{{count-1}}</h4>
-      <h4>総額：{{total_amount}}円</h4>
+      <h4 class="total_product">点数：{{item_lists.length}}</h4>
+      <h4 class="total_price">総額：{{total_amount}}円</h4>
     </div>
   </div>
 </template>
@@ -101,6 +133,9 @@ export default {
     let shop = ref()
     let total_amount = ref(0)
 
+    let edit_style = ref("block")
+    let preview_style = ref("none")
+
     // リスト変数
     // let type_option =
     // ["修理","アクセサリー","その他サービス"]
@@ -109,6 +144,7 @@ export default {
       {type:"repair", label:"修理"},
       {type:"accessory", label:"アクセサリー" },
       {type:"other", label:"その他サービス"},
+      {type:"discount", label:"値引き"}
     ])
 
     let product_list = ref([
@@ -116,6 +152,7 @@ export default {
       {product:"battery", label:"バッテリー交換"},
       {product:"backPanel", label:"バックパネル交換"},
       {product:"chargePort", label:"充電コネクター交換"},
+      {product:"other_repair", label:"その他修理"},
     ])
 
     let shop_list = ref([
@@ -145,7 +182,7 @@ export default {
       console.log(item_lists.value)
       type.value=""
       product.value=""
-      count.value++;
+      count.value++
       console.log(item_lists.value[0].price)
     }
 
@@ -153,8 +190,31 @@ export default {
       sum_price();
     }
 
+    const edit_close=()=>{
+      if(edit_style.value == "none"){
+        edit_style.value = "block";
+        preview_style.value = "none";
+      }else{
+        edit_style.value = "none"
+        preview_style.value = "block";
+      }
+    }
+
+    const delete_list=(id)=>{
+      item_lists.value.splice(id, 1)
+      reset_number(id);
+      console.log(item_lists.value)
+      console.log(item_lists.value)
+    }
+
+    const reset_number=(ids)=>{
+      for(let i = 0; i<item_lists.value.length; i++){
+        this.$delete(item_lists.value[ids], number);
+        item_lists.value[ids].number = i+1
+      }
+    }
+
     return{
-      count,
       shop,
 
       model_name,
@@ -177,6 +237,13 @@ export default {
 
       total_amount,
 
+      edit_style,
+      preview_style,
+      edit_close,
+
+      delete_list,
+      reset_number,
+
       sum_price,
       push,
       create,
@@ -190,11 +257,14 @@ export default {
   border:solid 2px;
   border-radius:10px;
   width:60%;
-  margin:auto;
+  background-color:white;
+  position:fixed;
+  display:"block";
 }
 
 .edit_contents{
   padding:20px;
+  display:inline;
 }
 
 .title{
@@ -208,6 +278,48 @@ export default {
 .edit_close_button{
   margin-left:10px;
   margin-top:10px;
+}
+
+.preview_table{
+  text-align:center;
+  margin:auto;
+  border-collapse: collapse;
+}
+
+.th_No{
+  width:30px;
+}
+
+.th_type{
+  width:140px;
+}
+
+.th_name{
+  width:200px;
+}
+
+.th_price{
+  width:140px;
+}
+
+.th_tax{
+  width:100px;
+}
+
+.th_other{
+  width:250px;
+}
+
+.edit_main{
+  display:inline-block;
+}
+
+.edit_sub{
+  display:inline-block;
+}
+
+.individual_title{
+  padding-top:15px;
 }
   
 </style>

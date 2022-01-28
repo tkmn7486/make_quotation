@@ -21,6 +21,11 @@ const routes = [
     path: '/price_cur',
     name: 'PC',
     component: () => import('../views/price_cur.vue')
+  },
+  {
+    path: '/take_over',
+    name: 'Take_over',
+    component: () => import('../views/take_over.vue')
   }
 ]
 

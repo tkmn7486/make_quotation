@@ -37,14 +37,15 @@
               <option>作業中</option>
             </select>
           </td>
-          <td><input type="text" v-model="Repair_ID"></td>
-          <td><textarea v-model="Repair_contents"></textarea></td>
-          <button>＋</button>
+          <td><input type="text" v-model="Repair_id"></td>
+          <td><textarea v-model="Repair_content"></textarea></td>
+          <button @click="push_repair">＋</button>
         </tr>
         <tr v-for="pre_repair_content in repair_contents" :key="pre_repair_content.id">
           <td>{{pre_repair_content.state}}</td>
           <td>{{pre_repair_content.r_id}}</td>
           <td>{{pre_repair_content.contents}}</td>
+          <td><button @click="remove_contents(pre_repair_content)">削除</button></td>
         </tr>
       </table>
 
@@ -135,6 +136,10 @@ export default {
     let no_contact = ref()
     let no_search = ref()
 
+    let Repair_selected = ref()
+    let Repair_id = ref()
+    let Repair_content = ref()
+
     let repair_add_button = ref("block")
 
     let repair_table_edit = ref("none")
@@ -169,7 +174,16 @@ export default {
 
     const add_repair_table=()=>{
       no_repair.value = "none";
+      repair_add_button.value = "none";
       repair_table_edit.value = "block";
+    }
+
+    const push_repair=()=>{
+      repair_contents.value.push({state:Repair_selected.value, r_id:Repair_id.value, contents:Repair_content.value});
+    }
+
+    const remove_contents=(list_name)=>{
+      list_name.value = 0;
     }
 
     return{
@@ -186,6 +200,10 @@ export default {
       no_repair,
       no_contact,
       no_search,
+
+      Repair_selected,
+      Repair_id,
+      Repair_content,
 
       repair_add_button,
 
@@ -206,6 +224,8 @@ export default {
 
       show_preview,
       add_repair_table,
+      push_repair,
+      remove_contents
 
     }
   }

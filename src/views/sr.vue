@@ -44,13 +44,13 @@ export default {
     const open_rec=()=>{
       fusion();
       createURL_rec(rightID.value);
-      location.href= URL_rec.value;
+      window.open(URL_rec.value, '_blank');
     }
 
     const open_rep=()=>{
       fusion();
       createURL_rep(rightID.value);
-      location.href= URL_rep.value;
+      window.open(URL_rep.value, '_blank');
     }
 
     return{

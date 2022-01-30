@@ -19,20 +19,32 @@
     <div class="repair_contents">
       <h2>■修理</h2>
       <h3 :style="{display:no_repair}">特になし</h3>
-      <button @click="add_repair_table" :style="{display:no_repair}">追加</button>
+      <button @click="add_repair_table" :style="{display:repair_add_button}">追加</button>
 
       <!-- 編集 -->
       <table class="edit_repair_table" :style="{display:repair_table_edit}">
         <tr>
-          <th>□</th>
-          <th>状況
-            <select v-model="repair_selected">
+          <th>状況</th>
+          <th>修理ID</th>
+          <th>内容</th>
+        </tr>
+        <tr>
+          <td>
+            <select v-model="Repair_selected">
               <option disabled value="">状況を選択</option>
               <option>未処理</option>
               <option>受入済</option>
               <option>作業中</option>
             </select>
-          </th>
+          </td>
+          <td><input type="text" v-model="Repair_ID"></td>
+          <td><textarea v-model="Repair_contents"></textarea></td>
+          <button>＋</button>
+        </tr>
+        <tr v-for="pre_repair_content in repair_contents" :key="pre_repair_content.id">
+          <td>{{pre_repair_content.state}}</td>
+          <td>{{pre_repair_content.r_id}}</td>
+          <td>{{pre_repair_content.contents}}</td>
         </tr>
       </table>
 
@@ -123,6 +135,8 @@ export default {
     let no_contact = ref()
     let no_search = ref()
 
+    let repair_add_button = ref("block")
+
     let repair_table_edit = ref("none")
     let repair_table_preview = ref("none")
 
@@ -144,6 +158,13 @@ export default {
     const show_preview=()=>{
       edit_style.value = "none";
       preview_style.value = "block";
+      repair_add_button.value = "none";
+      if(no_repair.value == "block"){
+        repair_table_style.value = "none";
+      }else{
+        no_repair.value = "none";
+        repair_table_style.value = "block";
+      }
     }
 
     const add_repair_table=()=>{
@@ -165,6 +186,8 @@ export default {
       no_repair,
       no_contact,
       no_search,
+
+      repair_add_button,
 
       contact_table_style,
 
@@ -193,6 +216,11 @@ export default {
 .days{
   width:30px;
   font-size:20px;
+}
+
+.app_contents{
+  margin-left:20px;
+  margin-right:20px;
 }
     
 </style>

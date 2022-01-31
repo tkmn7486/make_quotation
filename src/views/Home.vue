@@ -17,8 +17,8 @@
       <h2 class="pre_model_name" :style="{display:edit_mode_basic}" style="text-transform:uppercase">機種名：<input v-model="model_name" :key="model_names">{{model_name}}</h2>
 
       
-      <h2 class="graph_title">修理<input type="checkbox" checked id="repair_form" @click="repair_form_display"></h2>
-        <div class="repair_edit_form" :style="{display:edit_mode}">
+      <h2 class="graph_title">■修理<input type="checkbox" checked id="repair_form" @click="repair_form_display"></h2>
+        <div class="repair_edit_form" :style="{display:edit_mode_repair}">
           <div class="repair_type_form">
             <h3>修理項目</h3>
             <select v-model="type" :style="{display:select_input_type}">
@@ -73,11 +73,75 @@
           <td>{{item_list.price}}円</td>
           <td>{{item_list.tax}}円</td>
           <td class="pre_other">{{item_list.other}}</td>
-          <button @click="delete_list(index)" :style="{display:edit_mode}">削除</button>
+          <button @click="delete_list(index)" :style="{display:edit_mode_repair}">削除</button>
         </tr>
       </table>
-      <h4 class="total_product">点数：{{repair_item_lists.length}}</h4>
-      <h4 class="total_price">総額：{{total_amount}}円</h4>
+
+<!-- アクセサリー -->
+    <div class="accessory_area">
+      <h2 class="graph_title_accessory">■アクセサリ<input type="checkbox" id="accessory_form" @click="accessory_form_display"></h2>
+          <div class="repair_edit_form" :style="{display:edit_mode_accessory}">
+            <div class="repair_type_form">
+              <h3>販売品名</h3>
+              <select v-model="type" :style="{display:select_input_type}">
+                <option value="">商品を選択</option>
+                <option>iPhone ガラスフィルム</option>
+                <option>Android ガラスフィルム</option>
+                <option>iPad ガラスフィルム</option>
+                <option>ガラスコーティング</option>
+                <option>ガラスコーティング（特殊）</option>
+                <option>充電コネクタ</option>
+                <option>電源ボタン</option>
+                <option>音量ボタン</option>
+                <option>指紋センサー</option>
+              </select>
+              <input v-model="type" :style="{display:self_input_type}">
+              <button class="self_input_type" :style="{display:select_input_type}" @click="input_type_change_repair">入力欄の表示</button>
+              <button class="select_input_type" :style="{display:self_input_type}" @click="input_type_change_repair">選択欄の表示</button>
+            </div>
+            <div class="repair_price_form">
+              <h3>料金(税抜):<input v-model="price">円</h3>
+              <h4>消費税：{{price*0.1}}円</h4>
+            </div>
+            <div class="repair_other_form">
+              <div class="other_select_form">
+                注意点>>
+                <input type="checkbox" value="/分解時に破損のリスクあり" id="other1" v-model="o_contents"><label>破損</label>
+                <input type="checkbox" value="/分解時に塗装ハゲのリスクあり" id="other2" v-model="o_contents"><label>塗装ハゲ</label>
+                <input type="checkbox" value="/水没のため修理保証なし" id="other3" v-model="o_contents"><label>水没</label>
+              </div>
+              <textarea id="other_input" cols="30" rows="5" v-model="other"></textarea>
+              <div class="other_button_space">
+                <button class="other_button" @click="make_other()">更新</button>
+              </div>
+            </div>
+            <div class="add_button_space">
+              <button class="repair_add_button" @click="push_accessory">項目を追加</button>
+            </div>
+          </div>
+
+
+        <table class="preview_table" border="1">
+          <tr>
+            <th class="th_No">No.</th>
+            <th class="th_name">部位</th>
+            <th class="th_price">料金</th>
+            <th class="th_tax">消費税</th>
+            <th class="th_other">備考</th>
+          </tr>
+          <tr v-for="item_list in repair_item_lists" :key="item_list.id">
+            <td>{{item_list.number}}</td>
+            <td>{{item_list.type}}</td>
+            <td>{{item_list.price}}円</td>
+            <td>{{item_list.tax}}円</td>
+            <td class="pre_other">{{item_list.other}}</td>
+            <button @click="delete_list(index)" :style="{display:edit_mode_accessory}">削除</button>
+          </tr>
+        </table>
+
+        <h4 class="total_product">点数：{{repair_item_lists.length}}</h4>
+        <h4 class="total_price">総額：{{total_amount}}円</h4>
+      </div>
     </div>
   </div>
 </template>
@@ -99,29 +163,33 @@ export default {
     let tax = ref()
     let other = ref("")
     let repair_item_lists = ref([])
+    let accessory_item_lists = ref()
 
     let product_type = ref()
     let product_name = ref()
 
-    let shop = ref()
+    let shop = ref("スマホステーション吉祥寺店")
     let total_amount = ref(0)
+
+    let accessory_list = ref([
+      {type:"iPhone" ,name:"ガラスフィルム", price:"2700", other:""},
+      {type:"Android" ,name:"ガラスフィルム", price:"2700", other:""},
+      {type:"iPad" ,name:"ガラスフィルム", price:"2700", other:""},
+      {type:"" ,name:"ガラスコーテイング(通常)", price:"2750", other:""},
+      {type:"" ,name:"ガラスコーテイング(特殊)", price:"3300", other:""},
+    ])
 
     let edit_style = ref("block")
     let preview_style = ref("none")
 
-    let edit_mode = ref("block")
+    let edit_mode_repair = ref("block")
+    let edit_mode_accessory = ref("none")
 
     let select_input_type = ref("block")
     let self_input_type = ref("none")
 
     // 備考欄
     let o_contents = ref([]) 
-
-    let other_select = ref([
-      {Value:"Test1",ID:"test1"}
-    ])
-
-    let Other1 = document.getElementById("other1")
 
     // リスト変数
     // let type_option =
@@ -144,6 +212,8 @@ export default {
       count.value++
       sum_price(repair_item_lists);
       reset_number(repair_item_lists)
+      price.value = 0;
+
       console.log(repair_item_lists.value[0].price)
     }
 
@@ -180,10 +250,26 @@ export default {
     }
 
     const repair_form_display=()=>{
-      if(edit_mode.value == "block"){
-        edit_mode.value = "none";
+      if(edit_mode_repair.value == "block"){
+        edit_mode_repair.value = "none";
       }else{
-        edit_mode.value = "block";
+        edit_mode_repair.value = "block";
+      }
+    }
+
+    const accessory_form_display=()=>{
+      if(edit_mode_accessory.value == "block"){
+        edit_mode_accessory.value = "none";
+      }else{
+        edit_mode_accessory.value = "block";
+      }
+    }
+
+    const other_form_display=()=>{
+      if(edit_mode_repair.value == "block"){
+        edit_mode_repair.value = "none";
+      }else{
+        edit_mode_repair.value = "block";
       }
     }
 
@@ -209,6 +295,9 @@ export default {
       tax,
       other,
       repair_item_lists,
+      accessory_item_lists,
+
+      accessory_list,
 
       o_contents,
 
@@ -220,12 +309,11 @@ export default {
       edit_style,
       preview_style,
 
-      edit_mode,
+      edit_mode_repair,
+      edit_mode_accessory,
+
       select_input_type,
       self_input_type,
-
-      Other1,
-      other_select,
 
       delete_list,
       reset_number,
@@ -236,6 +324,9 @@ export default {
 
       change_display_parts,
       repair_form_display,
+      accessory_form_display,
+      other_form_display,
+
       input_type_change_repair,
 
       make_other,
@@ -265,6 +356,15 @@ export default {
 
 .header{
   text-align:right;
+}
+
+.accessory_area{
+  border-width: 1px 0 0 0;
+  border-style: dashed;
+}
+
+.graph_title_accessory{
+  margin-top:20px;
 }
 
 .edit_close_button{
@@ -315,6 +415,7 @@ export default {
   margin:auto;
   border-collapse: collapse;
   width:80%;
+  margin-bottom:20px;
 }
 
 tr{

@@ -22,7 +22,7 @@ import {ref} from 'vue'
 
 export default {
   setup(){
-    let nav_display = ref("none")
+    let nav_display = ref("block")
 
     const push_menu_button=()=>{
       if(nav_display.value == "none"){

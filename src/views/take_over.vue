@@ -6,7 +6,7 @@
     <!-- <button class="edit_close_button" @click="edit_close">+</button> -->
     <input type="button" value="このページを印刷する" onclick="window.print();" :style="{display:preview_style}" />
     <button @click="show_preview" :style="{display:edit_style}">印刷・保存準備</button>
-    <h1 @click="edit_close">引き継ぎ書</h1>
+    <h1 class="quontity_title" @click="edit_close">引き継ぎ書</h1>
     <div class="basic">
       <h3 class="preview_day" :style="{display:preview_style}">日付：{{today}}</h3>
       <h3 class="edit_day" :style="{display:edit_style}">日付：<input type="date" v-model="today"></h3>
@@ -242,5 +242,8 @@ export default {
   margin-left:20px;
   margin-right:20px;
 }
-    
+
+.quontity_title{
+  text-align:center;
+}
 </style>

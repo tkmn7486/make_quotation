@@ -1,108 +1,82 @@
 <template>
   <div class="app">
-    <div class="edit" :style="{display:edit_style}">
-      <!-- 入力フォーム側 -->
-      <div class="edit_main">
-        <button class="edit_close_button" @click="edit_close">×</button>
-        <div class="edit_contents">
-          <h2 class="base_title">基礎情報 >></h2>
-          <h3>店舗：
-            <select v-model="shop">
-              <option v-for="shops in shop_list" :key="shops.id">{{shops.label}}</option>
-            </select>
-          </h3>
-          <h3>機種名：<input v-model="model_name"></h3>
-
-          <h2 class="individual_title">個別情報</h2>
-          <div class="type_form">
-            <h3>種別：
-              <select v-model="product_type">
-                <option v-for="type in type_list" :key="type.id">{{type.label}}</option>
-              </select>
-            </h3>
-          </div>
-
-          <div class="product_form">
-            <h3>名称：
-              <select v-model="product_name">
-                <option v-for="products in product_list" :key="products.id">{{products.label}}</option>
-              </select>
-            </h3>
-          </div>
-
-          <div class="price_form">
-            <h3>金額(税抜)：
-              <input v-model="price">
-            </h3>
-            <h3>消費税：{{Number(price)/10}}</h3>
-          </div>
-
-          <div class="other_form">
-            <h3>↓備考↓</h3>
-            <textarea v-model="other" name="product_other" id="product_other" cols="30" rows="10"></textarea>
-          </div>
-
-          <button @click="push">追加</button>
-          <button @click="create">見積書作成</button>
-        </div>
-      </div>
-
-      <!-- 追加内容のプレビュー -->
-      <div class="edit_sub">
-        <div class="edit_sub_contents">
-          <h2>↓追加済みのアイテム↓</h2>
-          <table>
-            <tr>
-              <th>No.</th>
-              <th>種別</th>
-              <th>名称</th>
-              <th>金額（税抜）</th>
-              <th>消費税</th>
-              <th>備考</th>
-            </tr>
-            <tr v-for="(list, index) in item_lists" :key="list.id">
-              <td>{{list.number}}</td>
-              <td>{{list.type}}</td>
-              <td>{{list.name}}</td>
-              <td>{{list.price}}円</td>
-              <td>{{list.tax}}円</td>
-              <td><textarea v-model="list.other"></textarea></td>
-              <td><button @click="delete_list(index)">削除</button></td>
-            </tr>
-          </table>
-        </div>
-      </div>
-    </div>
-
-
-<!-- 見積書本体 -->
-    <div class="preview" :style="{display:preview_style}">
+    <div class="preview">
       <div class="title">
         <h1>お見積り</h1>
       </div>
       <div class="header">
-        <h3 class="shop_name">{{shop}}</h3>
+        <h3 class="edi_shop_name">
+          <select v-model="shop">
+            <option value="">店舗を選択</option>
+            <option>スマホステーション吉祥寺店</option>
+            <option>スマホステーション三軒茶屋店</option>
+          </select>
+        </h3>
+        <h3 class="pre_shop_name">{{shop}}</h3>
       </div>
-      <h2>機種名：{{model_name}}</h2>
+      <h2 class="pre_model_name" :style="{display:edit_mode_basic}" style="text-transform:uppercase">機種名：<input v-model="model_name" :key="model_names">{{model_name}}</h2>
+
+      
+      <h2 class="graph_title">修理<input type="checkbox" checked id="repair_form" @click="repair_form_display"></h2>
+        <div class="repair_edit_form" :style="{display:edit_mode}">
+          <div class="repair_type_form">
+            <h3>修理項目</h3>
+            <select v-model="type" :style="{display:select_input_type}">
+              <option value="">パーツを選択</option>
+              <option>液晶画面（一体型）</option>
+              <option>液晶画面（ガラスのみ）</option>
+              <option>液晶画面（液晶のみ）</option>
+              <option>バッテリー</option>
+              <option>バックパネル</option>
+              <option>充電コネクタ</option>
+              <option>電源ボタン</option>
+              <option>音量ボタン</option>
+              <option>指紋センサー</option>
+            </select>
+            <input v-model="type" :style="{display:self_input_type}">
+            <button class="self_input_type" :style="{display:select_input_type}" @click="input_type_change_repair">入力欄の表示</button>
+            <button class="select_input_type" :style="{display:self_input_type}" @click="input_type_change_repair">選択欄の表示</button>
+          </div>
+          <div class="repair_price_form">
+            <h3>料金(税抜):<input v-model="price">円</h3>
+            <h4>消費税：{{price*0.1}}円</h4>
+          </div>
+          <div class="repair_other_form">
+            <div class="other_select_form">
+              注意点>>
+              <input type="checkbox" value="/分解時に破損のリスクあり" id="other1" v-model="o_contents"><label>破損</label>
+              <input type="checkbox" value="/分解時に塗装ハゲのリスクあり" id="other2" v-model="o_contents"><label>塗装ハゲ</label>
+              <input type="checkbox" value="/水没のため修理保証なし" id="other3" v-model="o_contents"><label>水没</label>
+            </div>
+            <textarea id="other_input" cols="30" rows="5" v-model="other"></textarea>
+            <div class="other_button_space">
+              <button class="other_button" @click="make_other()">更新</button>
+            </div>
+          </div>
+          <div class="add_button_space">
+            <button class="repair_add_button" @click="push_repair">項目を追加</button>
+          </div>
+         </div>
+
+
       <table class="preview_table" border="1">
         <tr>
           <th class="th_No">No.</th>
-          <th class="th_type">サービスタイプ</th>
-          <th class="th_name">名称</th>
+          <th class="th_name">部位</th>
           <th class="th_price">料金</th>
           <th class="th_tax">消費税</th>
           <th class="th_other">備考</th>
         </tr>
-        <tr v-for="item_list in item_lists" :key="item_list.id">
+        <tr v-for="item_list in repair_item_lists" :key="item_list.id">
           <td>{{item_list.number}}</td>
           <td>{{item_list.type}}</td>
-          <td>{{item_list.name}}</td>
           <td>{{item_list.price}}円</td>
           <td>{{item_list.tax}}円</td>
-          <td>{{item_list.other}}</td>
+          <td class="pre_other">{{item_list.other}}</td>
+          <button @click="delete_list(index)" :style="{display:edit_mode}">削除</button>
         </tr>
       </table>
-      <h4 class="total_product">点数：{{item_lists.length}}</h4>
+      <h4 class="total_product">点数：{{repair_item_lists.length}}</h4>
       <h4 class="total_price">総額：{{total_amount}}円</h4>
     </div>
   </div>
@@ -121,11 +95,10 @@ export default {
     let model_name = ref()
     let number = ref()
     let type = ref()
-    let product = ref()
-    let price = ref()
+    let price = ref(0)
     let tax = ref()
-    let other = ref()
-    let item_lists = ref([])
+    let other = ref("")
+    let repair_item_lists = ref([])
 
     let product_type = ref()
     let product_name = ref()
@@ -136,81 +109,93 @@ export default {
     let edit_style = ref("block")
     let preview_style = ref("none")
 
+    let edit_mode = ref("block")
+
+    let select_input_type = ref("block")
+    let self_input_type = ref("none")
+
+    // 備考欄
+    let o_contents = ref([]) 
+
+    let other_select = ref([
+      {Value:"Test1",ID:"test1"}
+    ])
+
+    let Other1 = document.getElementById("other1")
+
     // リスト変数
     // let type_option =
     // ["修理","アクセサリー","その他サービス"]
 
-    let type_list = ref([
-      {type:"repair", label:"修理"},
-      {type:"accessory", label:"アクセサリー" },
-      {type:"other", label:"その他サービス"},
-      {type:"discount", label:"値引き"}
-    ])
-
-    let product_list = ref([
-      {product:"front", label:"画面交換"},
-      {product:"battery", label:"バッテリー交換"},
-      {product:"backPanel", label:"バックパネル交換"},
-      {product:"chargePort", label:"充電コネクター交換"},
-      {product:"other_repair", label:"その他修理"},
-    ])
-
-    let shop_list = ref([
-      {shop:"sma_kichi", label:"スマホステーション吉祥寺店"},
-      {shop:"sma_sancha", label:"スマホステーション三軒茶屋店"},
-    ])
-
-    let service_list = ref([
-    ])
-
-    let accessory_list = ref([
-    ])
-
-    const sum_price=()=>{
+    const sum_price=(item_lists)=>{
+      total_amount.value = 0;
       for(let i=0; i<item_lists.value.length; i++){
         total_amount.value = Number(total_amount.value)+Number(item_lists.value[i].price)+Number(item_lists.value[i].tax)
       }
     }
 
-    const push=()=>{
-      console.log(product_name.value)
-      number.value = count.value
-      type.value = product_type.value
-      product.value = product_name.value
-      tax.value = Number(price.value)/10
-      item_lists.value.push({number:number.value, type:type.value, name:product.value, price:price.value, tax:tax.value, other:other.value});
+    const push_repair=(item_lists)=>{
+      number.value = count.value;
+      tax.value = Math.round(Number(price.value)/10)
+      repair_item_lists.value.push({number:number.value, type:type.value, price:price.value, tax:tax.value, other:other.value});
       console.log(item_lists.value)
       type.value=""
-      product.value=""
+      other.value=""
       count.value++
-      console.log(item_lists.value[0].price)
+      sum_price(repair_item_lists);
+      reset_number(repair_item_lists)
+      console.log(repair_item_lists.value[0].price)
     }
 
     const create=()=>{
       sum_price();
     }
 
-    const edit_close=()=>{
-      if(edit_style.value == "none"){
-        edit_style.value = "block";
-        preview_style.value = "none";
-      }else{
-        edit_style.value = "none"
-        preview_style.value = "block";
+    const delete_list=(id)=>{
+      console.log("id:",id);
+      repair_item_lists.value.splice(id, 1)
+      console.log(repair_item_lists.value)
+      sum_price(repair_item_lists);
+      reset_number(repair_item_lists);
+      console.log("総額：",total_amount.value)
+      console.log(repair_item_lists.value)
+    }
+
+    const reset_number=(item_lists)=>{
+      delete item_lists.value.number;
+      for(let i = 0; i < item_lists.value.length; i++){
+        item_lists.value[i].number = i+1;
       }
     }
 
-    const delete_list=(id)=>{
-      item_lists.value.splice(id, 1)
-      reset_number(id);
-      console.log(item_lists.value)
-      console.log(item_lists.value)
+    const change_display_parts=()=>{
+
     }
 
-    const reset_number=(ids)=>{
-      for(let i = 0; i<item_lists.value.length; i++){
-        this.$delete(item_lists.value[ids], number);
-        item_lists.value[ids].number = i+1
+    const make_other=()=>{
+      console.log("push");
+      for(let i = 0; o_contents.value.length>i; i++){
+        other.value = other.value + o_contents.value[i] + "\n " ;
+      }
+    }
+
+    const repair_form_display=()=>{
+      if(edit_mode.value == "block"){
+        edit_mode.value = "none";
+      }else{
+        edit_mode.value = "block";
+      }
+    }
+
+    const input_type_change_repair=()=>{
+      if(self_input_type.value == "block"){
+        type.value = "";
+        self_input_type.value = "none";
+        select_input_type.value = "block";
+      }else{
+        type.value = "";
+        self_input_type.value = "block";
+        select_input_type.value = "none";        
       }
     }
 
@@ -220,33 +205,40 @@ export default {
       model_name,
       number,
       type,
-      product,
       price,
       tax,
       other,
-      item_lists,
+      repair_item_lists,
+
+      o_contents,
 
       product_type,
       product_name,
-
-      type_list,
-      product_list,
-      shop_list,
-      service_list,
-      accessory_list,
 
       total_amount,
 
       edit_style,
       preview_style,
-      edit_close,
+
+      edit_mode,
+      select_input_type,
+      self_input_type,
+
+      Other1,
+      other_select,
 
       delete_list,
       reset_number,
 
       sum_price,
-      push,
+      push_repair,
       create,
+
+      change_display_parts,
+      repair_form_display,
+      input_type_change_repair,
+
+      make_other,
     }
   }
 }
@@ -280,10 +272,53 @@ export default {
   margin-top:10px;
 }
 
+.repair_edit_form{
+  border:solid 5px;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+
+/* 修理編集項目 */
+.repair_type_form{
+  text-align:center;
+  padding-left:10px;
+  display:inline-block;
+}
+
+.repair_price_form{
+  padding-left:40px;
+  display:inline-block;
+}
+
+.repair_other_form{
+  padding-left:40px;
+  display:inline-block;
+}
+
+.other_button{
+  height:30px;
+}
+
+.add_button_space{
+  padding-left:10px;
+  display:inline-block;
+}
+
+.repair_add_button{
+  font-size:20px;
+  border:solid 3px;
+  border-radius:10px;
+}
+
 .preview_table{
   text-align:center;
   margin:auto;
   border-collapse: collapse;
+  width:80%;
+}
+
+tr{
+  text-align:center;
 }
 
 .th_No{
@@ -307,7 +342,7 @@ export default {
 }
 
 .th_other{
-  width:250px;
+  width:300px;
 }
 
 .edit_main{
